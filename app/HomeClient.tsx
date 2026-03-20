@@ -144,22 +144,6 @@ export default function HomeClient({ isAdmin, firstName }: HomeClientProps) {
             </a>
           </motion.div>
 
-          {/* Scroll Indicator */}
-          <motion.div
-            variants={fadeInUp}
-            className="absolute bottom-12 left-1/2 -translate-x-1/2"
-          >
-            <motion.div
-              animate={{ y: [0, 8, 0] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              className="flex flex-col items-center gap-2"
-            >
-              <span className="text-xs tracking-[0.2em] text-[#f5f3f0]/50">SCROLL</span>
-              <svg className="h-6 w-4 text-[#6b8e6f]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-              </svg>
-            </motion.div>
-          </motion.div>
         </motion.div>
       </section>
 
@@ -294,6 +278,7 @@ export default function HomeClient({ isAdmin, firstName }: HomeClientProps) {
             className="mt-16 text-center"
           >
             <a
+            
               href="#contact"
               className="inline-flex items-center gap-2 rounded-full border border-[#6b8e6f]/30 bg-[#6b8e6f]/10 px-6 py-3 text-sm font-medium text-[#6b8e6f] transition-all hover:border-[#6b8e6f]/50 hover:bg-[#6b8e6f]/20"
             >
