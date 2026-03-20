@@ -277,16 +277,16 @@ export default function HomeClient({ isAdmin, firstName }: HomeClientProps) {
             transition={{ delay: 0.5 }}
             className="mt-16 text-center"
           >
-            <a
-            
-              href="#contact"
+            <Link
+
+              href="/portfolio"
               className="inline-flex items-center gap-2 rounded-full border border-[#6b8e6f]/30 bg-[#6b8e6f]/10 px-6 py-3 text-sm font-medium text-[#6b8e6f] transition-all hover:border-[#6b8e6f]/50 hover:bg-[#6b8e6f]/20"
             >
               View Full Collection
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
-            </a>
+            </Link>
           </motion.div>
         </div>
       </section>
