@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Admin {
+  id           String         @id @default(cuid())
+  email        String         @unique
+  passwordHash String
+  isActive     Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  sessions     AdminSession[]
+}
+
+model AdminSession {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  adminId   String
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  admin Admin @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([adminId])
+  @@index([expiresAt])
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  location    String?  // Where the photo was taken (e.g., "Swiss Alps", "Yosemite")
+  category    String?  // e.g., "Mountains", "Coastal", "Forest", "Desert"
+  capturedAt  DateTime? // When the photo was taken
+  coverImage  String?
+  isFeatured  Boolean  @default(false) // For homepage featured work
+  isPublished Boolean  @default(false)
+  position    Int      @default(0) // For manual ordering
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  images ProjectImage[]
+
+  @@index([isFeatured])
+  @@index([isPublished])
+  @@index([category])
+}
+
+model ProjectImage {
+  id          String   @id @default(cuid())
+  projectId   String
+  title       String?
+  description String?  @db.Text // Alt text and image description
+  size        Int?
+  width       Int?     // Image dimensions for aspect ratio
+  height      Int?     
+  position    Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  project   Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  content   ImageContent?
+
+  @@index([projectId])
+}
+
+model ImageContent {
+  id      String @id @default(cuid())
+  imageId String @unique
+  data    Bytes
+  format  String
+
+  image ProjectImage @relation(fields: [imageId], references: [id], onDelete: Cascade)
+}
