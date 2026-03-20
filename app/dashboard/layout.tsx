@@ -22,7 +22,7 @@ export default async function DashboardLayout({
       <header className="sticky top-0 z-50 flex items-center justify-between border-b border-white/10 bg-(--site-ink)/80 px-6 py-4 backdrop-blur-md shadow-lg">
         <div className="flex items-center gap-4">
           <Link href="/" className="text-sm font-bold tracking-widest text-(--site-gold) transition hover:text-white">
-            BREIZH PEINTURE
+            Alex Morgan
           </Link>
           <span className="hidden sm:inline-block rounded-full border border-emerald-300/30 bg-emerald-300/10 px-3 py-1 text-xs text-emerald-300">
             Admin: {firstName}
