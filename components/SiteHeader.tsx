@@ -29,23 +29,18 @@ export function SiteHeader({ isAdmin, firstName }: SiteHeaderProps) {
             {isAdmin ? (
               <div className="flex items-center gap-3">
                 <span className="hidden rounded-full border border-emerald-300/30 bg-emerald-300/10 px-3 py-1 text-xs text-emerald-300 md:inline-block">
-                  Admin: {firstName}
+                  Admin
                 </span>
                 <Link
                   href="/dashboard"
                   className="rounded-lg border border-[#6b8e6f]/30 bg-[#6b8e6f]/10 px-3 py-1.5 text-xs text-[#6b8e6f] transition-all hover:bg-[#6b8e6f]/20"
                 >
-                  Dashboard
+                  Panneau de contrôle
                 </Link>
                 <SignOutButton className="text-xs text-[#f5f3f0]/50 hover:text-[#f5f3f0]" />
               </div>
             ) : (
-              <Link
-                href="/login"
-                className="text-xs text-[#f5f3f0]/50 transition-colors hover:text-[#f5f3f0]"
-              >
-                Admin
-              </Link>
+              <></>
             )}
           </div>
         </div>

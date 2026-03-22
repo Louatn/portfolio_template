@@ -26,7 +26,6 @@ export async function GET() {
             orderBy: {
               position: 'asc',
             },
-            take: 1,
           },
         },
       }),
@@ -51,7 +50,6 @@ export async function GET() {
             orderBy: {
               position: 'asc',
             },
-            take: 1,
           },
         },
       }),
@@ -74,7 +72,6 @@ export async function GET() {
             orderBy: {
               position: 'asc',
             },
-            take: 1,
           },
         },
       }),

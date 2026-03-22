@@ -68,6 +68,33 @@ export function NewProjectModal({ isOpen, onClose, projectId }: NewProjectModalP
     }
   }, [isOpen, projectId]);
 
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const scrollY = window.scrollY;
+    const originalStyle = {
+      overflow: document.body.style.overflow,
+      position: document.body.style.position,
+      top: document.body.style.top,
+      width: document.body.style.width,
+    };
+
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
+
+    return () => {
+      document.body.style.overflow = originalStyle.overflow;
+      document.body.style.position = originalStyle.position;
+      document.body.style.top = originalStyle.top;
+      document.body.style.width = originalStyle.width;
+      window.scrollTo(0, scrollY);
+    };
+  }, [isOpen]);
+
   const loadProjectForEditing = async (id: string) => {
     try {
       const response = await fetch(`/api/projects/${id}`);
@@ -320,13 +347,13 @@ export function NewProjectModal({ isOpen, onClose, projectId }: NewProjectModalP
 
   return (
     <>
-      <div className="fixed inset-0 z-40 flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-40 flex items-end justify-center p-0 sm:items-center sm:p-4">
         <div 
           className="absolute inset-0 bg-black/60 backdrop-blur-sm"
           onClick={onClose}
         ></div>
 
-        <div className="relative z-50 w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-3xl border border-white/10 bg-(--site-ink) p-8 shadow-2xl">
+        <div className="relative z-50 w-full max-w-4xl max-h-[100dvh] overflow-y-auto overscroll-contain rounded-t-3xl border border-white/10 bg-(--site-ink) p-4 pb-6 shadow-2xl sm:max-h-[90vh] sm:rounded-3xl sm:p-8">
           <button
             onClick={onClose}
             className="absolute right-6 top-6 rounded-full bg-white/5 p-2 text-white/50 transition hover:bg-white/10 hover:text-white"
@@ -529,21 +556,21 @@ export function NewProjectModal({ isOpen, onClose, projectId }: NewProjectModalP
               </div>
             </div>
 
-            <div className="flex justify-between items-center gap-3 pt-6 border-t border-white/10">
+            <div className="flex flex-col-reverse justify-between gap-3 border-t border-white/10 pt-6 sm:flex-row sm:items-center">
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-full px-5 py-2.5 text-sm font-semibold text-(--site-mist) hover:text-white hover:bg-white/10 transition"
+                className="w-full rounded-full px-5 py-2.5 text-sm font-semibold text-(--site-mist) transition hover:bg-white/10 hover:text-white sm:w-auto"
               >
                 Annuler
               </button>
               
-              <div className="flex gap-3">
+              <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
                 <button
                   type="button"
                   onClick={() => handleSave(false)}
                   disabled={isSaving || !title.trim()}
-                  className="rounded-full bg-white/10 px-6 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full rounded-full bg-white/10 px-6 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
                 >
                   {isSaving ? 'Sauvegarde...' : 'Sauvegarder et visualiser'}
                 </button>
@@ -552,7 +579,7 @@ export function NewProjectModal({ isOpen, onClose, projectId }: NewProjectModalP
                   type="button"
                   onClick={() => handleSave(true)}
                   disabled={isSaving || !title.trim()}
-                  className="rounded-full bg-(--site-gold) px-6 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-(--site-gold)/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full rounded-full bg-(--site-gold) px-6 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-(--site-gold)/20 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
                 >
                   {isSaving ? 'Publication...' : 'Sauvegarder et publier'}
                 </button>

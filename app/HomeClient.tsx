@@ -5,6 +5,7 @@ import { motion, useScroll, useTransform, Variants } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { loadPublicProjectsData, type PublicProject } from "@/lib/public-project-session";
 import { getProjectImageUrl } from "@/lib/utils/image-helpers";
+import { ProjectDetailModal } from "@/components/ProjectDetailModal";
 
 const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 40 },
@@ -31,6 +32,8 @@ export default function HomeClient() {
   const containerRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const [projects, setProjects] = useState<PublicProject[]>([]);
+  const [selectedProject, setSelectedProject] = useState<PublicProject | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.5, 1], [1, 0.8, 0.3]);
@@ -59,7 +62,8 @@ export default function HomeClient() {
   }, []);
 
   return (
-    <main ref={containerRef} className="relative bg-[#0a0f0d] text-[#f5f3f0] selection:bg-[#6b8e6f]/30">
+    <>
+      <main ref={containerRef} className="relative bg-[#0a0f0d] text-[#f5f3f0] selection:bg-[#6b8e6f]/30">
       {/* Hero Section */}
       <section ref={heroRef} className="relative flex min-h-screen items-center justify-center overflow-hidden">
         {/* Background Image with Parallax */}
@@ -250,7 +254,11 @@ export default function HomeClient() {
                     key={project.id}
                     variants={scaleIn}
                     whileHover={{ y: -8 }}
-                    className="group relative overflow-hidden rounded-2xl border border-[#3d4d43]/20 bg-[#1a2520] transition-all hover:border-[#6b8e6f]/30 hover:shadow-2xl hover:shadow-[#6b8e6f]/10"
+                    onClick={() => {
+                      setSelectedProject(project);
+                      setIsModalOpen(true);
+                    }}
+                    className="group relative cursor-pointer overflow-hidden rounded-2xl border border-[#3d4d43]/20 bg-[#1a2520] transition-all hover:border-[#6b8e6f]/30 hover:shadow-2xl hover:shadow-[#6b8e6f]/10"
                   >
                     <div className={`${aspect} w-full overflow-hidden bg-gradient-to-br from-[#2d3c33] to-[#1a2520]`}>
                       {imageUrl ? (
@@ -548,6 +556,16 @@ export default function HomeClient() {
         </div>
       </section>
 
-    </main>
+      </main>
+
+      <ProjectDetailModal
+        project={selectedProject}
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedProject(null);
+        }}
+      />
+    </>
   );
 }

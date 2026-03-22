@@ -22,6 +22,7 @@ export function ProjectCard({
   onPublish
 }: ProjectCardProps) {
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showMobileActions, setShowMobileActions] = useState(false);
   const statusColors = {
     DRAFT: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
     PUBLISHED: "bg-green-500/20 text-green-400 border-green-500/30",
@@ -50,11 +51,23 @@ export function ProjectCard({
     }
   };
 
+  const handleCardClick = () => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const isMobileDevice = window.matchMedia("(max-width: 768px)").matches;
+    if (isMobileDevice) {
+      setShowMobileActions((prev) => !prev);
+    }
+  };
+
   return (
     <div className={`group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm transition hover:border-white/20 hover:bg-white/10 ${
       isDeleting ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
     }`}
     style={{ transition: 'opacity 300ms ease-out, transform 300ms ease-out' }}
+    onClick={handleCardClick}
     >
       {/* Cover Image */}
       <div className="relative aspect-video w-full overflow-hidden bg-black/30">
@@ -89,10 +102,13 @@ export function ProjectCard({
         )}
 
         {/* Hover Overlay with Actions */}
-        <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/60 opacity-0 transition group-hover:opacity-100">
+        <div className={`absolute inset-0 flex items-center justify-center gap-2 bg-black/60 transition ${showMobileActions ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
           {onEdit && (
             <button
-              onClick={() => onEdit(project.id)}
+              onClick={(event) => {
+                event.stopPropagation();
+                onEdit(project.id);
+              }}
               className="rounded-full bg-white/10 p-2 text-white backdrop-blur-sm transition hover:bg-white/20"
               title="Modifier"
             >
@@ -104,7 +120,10 @@ export function ProjectCard({
 
           {project.status === ProjectStatus.ARCHIVED && onUnarchive && (
             <button
-              onClick={() => onUnarchive(project.id)}
+              onClick={(event) => {
+                event.stopPropagation();
+                onUnarchive(project.id);
+              }}
               className="rounded-full bg-white/10 p-2 text-white backdrop-blur-sm transition hover:bg-white/20"
               title="Désarchiver"
             >
@@ -116,7 +135,10 @@ export function ProjectCard({
 
           {project.status === ProjectStatus.ARCHIVED && onPublish && (
             <button
-              onClick={() => onPublish(project.id)}
+              onClick={(event) => {
+                event.stopPropagation();
+                onPublish(project.id);
+              }}
               className="rounded-full bg-green-500/20 p-2 text-white backdrop-blur-sm transition hover:bg-green-500/40"
               title="Publier"
             >
@@ -128,7 +150,10 @@ export function ProjectCard({
 
           {project.status !== ProjectStatus.ARCHIVED && onArchive && (
             <button
-              onClick={() => onArchive(project.id)}
+              onClick={(event) => {
+                event.stopPropagation();
+                onArchive(project.id);
+              }}
               className="rounded-full bg-white/10 p-2 text-white backdrop-blur-sm transition hover:bg-orange-500/20"
               title="Archiver"
             >
@@ -140,7 +165,10 @@ export function ProjectCard({
 
           {onDelete && (
             <button
-              onClick={handleDelete}
+              onClick={(event) => {
+                event.stopPropagation();
+                handleDelete();
+              }}
               className="rounded-full bg-red-500/20 p-2 text-white backdrop-blur-sm transition hover:bg-red-500/40"
               title="Supprimer"
             >

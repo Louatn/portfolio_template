@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, Variants } from "framer-motion";
 import { loadPublicProjectsData, type PublicProject } from "@/lib/public-project-session";
 import { getProjectImageUrl } from "@/lib/utils/image-helpers";
+import { ProjectDetailModal } from "@/components/ProjectDetailModal";
 
 const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 40 },
@@ -31,6 +32,8 @@ export default function PortfolioClient() {
   const [projects, setProjects] = useState<PublicProject[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedProject, setSelectedProject] = useState<PublicProject | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     let isActive = true;
@@ -168,7 +171,11 @@ export default function PortfolioClient() {
                     key={project.id}
                     variants={scaleIn}
                     whileHover={{ y: -8 }}
-                    className="group relative overflow-hidden rounded-2xl border border-[#3d4d43]/20 bg-[#1a2520] transition-all hover:border-[#6b8e6f]/30 hover:shadow-2xl hover:shadow-[#6b8e6f]/10"
+                    onClick={() => {
+                      setSelectedProject(project);
+                      setIsModalOpen(true);
+                    }}
+                    className="group relative cursor-pointer overflow-hidden rounded-2xl border border-[#3d4d43]/20 bg-[#1a2520] transition-all hover:border-[#6b8e6f]/30 hover:shadow-2xl hover:shadow-[#6b8e6f]/10"
                   >
                     <div className={`${aspect} w-full overflow-hidden bg-gradient-to-br from-[#2d3c33] to-[#1a2520]`}>
                       {imageUrl ? (
@@ -242,6 +249,15 @@ export default function PortfolioClient() {
           </motion.div>
         </div>
       </section>
+
+      <ProjectDetailModal
+        project={selectedProject}
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedProject(null);
+        }}
+      />
     </main>
   );
 }
