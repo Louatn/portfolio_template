@@ -31,18 +31,6 @@ const scaleIn: Variants = {
   visible: { opacity: 1, scale: 1, transition: { duration: 1, ease: [0.22, 1, 0.36, 1] } }
 };
 
-const backdropBlur: Variants = {
-  hidden: { opacity: 0 },
-  visible: { 
-    opacity: 1, 
-    transition: { 
-      duration: 1.2, 
-      delay: 1.3,
-      ease: [0.22, 1, 0.36, 1] 
-    } 
-  }
-};
-
 export default function HomeClient() {
   const containerRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
@@ -134,14 +122,6 @@ export default function HomeClient() {
             animate="visible"
             className="relative"
           >
-            {/* Dark backdrop for text - appears after animation */}
-            <motion.div 
-              variants={backdropBlur}
-              initial="hidden"
-              animate="visible"
-              className="absolute inset-x-0 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120vw] h-[110%] bg-gradient-to-b from-black/70 via-black/80 to-black/70 rounded-[3rem] blur-3xl"
-            />
-
             <motion.p variants={fadeInUp} className="relative mb-6 font-display text-sm tracking-[0.3em] text-[#6b8e6f] sm:text-base drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
               EXEMPLE BTP
             </motion.p>
