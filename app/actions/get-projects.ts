@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { ProjectStatus } from "@prisma/client";
 
 export type ProjectWithImages = {
   id: string;
@@ -9,11 +10,14 @@ export type ProjectWithImages = {
   location: string | null;
   category: string | null;
   coverImage: string | null;
+  status: ProjectStatus;
   isFeatured: boolean;
   position: number;
   createdAt: Date;
+  updatedAt: Date;
   images: {
     id: string;
+    url: string | null;
     title: string | null;
     description: string | null;
     position: number;
@@ -29,7 +33,7 @@ export async function getFeaturedProjects(limit: number = 6): Promise<ProjectWit
   const featuredProjects = await prisma.project.findMany({
     where: {
       isFeatured: true,
-      isPublished: true,
+      status: ProjectStatus.PUBLISHED,
     },
     orderBy: {
       position: 'asc',
@@ -39,6 +43,7 @@ export async function getFeaturedProjects(limit: number = 6): Promise<ProjectWit
       images: {
         select: {
           id: true,
+          url: true,
           title: true,
           description: true,
           position: true,
@@ -62,7 +67,7 @@ export async function getFeaturedProjects(limit: number = 6): Promise<ProjectWit
 
   const additionalProjects = await prisma.project.findMany({
     where: {
-      isPublished: true,
+      status: ProjectStatus.PUBLISHED,
       isFeatured: false,
       id: {
         notIn: featuredIds,
@@ -76,6 +81,7 @@ export async function getFeaturedProjects(limit: number = 6): Promise<ProjectWit
       images: {
         select: {
           id: true,
+          url: true,
           title: true,
           description: true,
           position: true,
@@ -97,7 +103,7 @@ export async function getFeaturedProjects(limit: number = 6): Promise<ProjectWit
 export async function getAllPublishedProjects(): Promise<ProjectWithImages[]> {
   const projects = await prisma.project.findMany({
     where: {
-      isPublished: true,
+      status: ProjectStatus.PUBLISHED,
     },
     orderBy: {
       position: 'asc',
@@ -106,6 +112,7 @@ export async function getAllPublishedProjects(): Promise<ProjectWithImages[]> {
       images: {
         select: {
           id: true,
+          url: true,
           title: true,
           description: true,
           position: true,
@@ -127,7 +134,7 @@ export async function getAllPublishedProjects(): Promise<ProjectWithImages[]> {
 export async function getCategories(): Promise<string[]> {
   const projects = await prisma.project.findMany({
     where: {
-      isPublished: true,
+      status: ProjectStatus.PUBLISHED,
       category: {
         not: null,
       },
@@ -142,4 +149,88 @@ export async function getCategories(): Promise<string[]> {
     .map(p => p.category)
     .filter((cat): cat is string => cat !== null)
     .sort();
+}
+
+/**
+ * Get all projects (admin only)
+ */
+export async function getAllProjects(): Promise<ProjectWithImages[]> {
+  const projects = await prisma.project.findMany({
+    include: {
+      images: {
+        select: {
+          id: true,
+          url: true,
+          title: true,
+          description: true,
+          position: true,
+        },
+        orderBy: {
+          position: 'asc',
+        },
+      },
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+
+  return projects;
+}
+
+/**
+ * Get projects by status
+ */
+export async function getProjectsByStatus(status: ProjectStatus): Promise<ProjectWithImages[]> {
+  const projects = await prisma.project.findMany({
+    where: {
+      status,
+    },
+    include: {
+      images: {
+        select: {
+          id: true,
+          url: true,
+          title: true,
+          description: true,
+          position: true,
+        },
+        orderBy: {
+          position: 'asc',
+        },
+      },
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+
+  return projects;
+}
+
+/**
+ * Get a single project by ID
+ */
+export async function getProjectById(id: string): Promise<ProjectWithImages | null> {
+  const project = await prisma.project.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      images: {
+        select: {
+          id: true,
+          url: true,
+          title: true,
+          description: true,
+          position: true,
+        },
+        orderBy: {
+          position: 'asc',
+        },
+      },
+    },
+  });
+
+  return project;
 }

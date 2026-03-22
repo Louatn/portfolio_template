@@ -4,10 +4,13 @@ import Link from "next/link";
 import { motion, useScroll, useTransform, Variants } from "framer-motion";
 import { SignOutButton } from "@/components/SignOutButton";
 import { useRef } from "react";
+import { ProjectWithImages } from "./actions/get-projects";
+import { getProjectImageUrl } from "@/lib/utils/image-helpers";
 
 interface HomeClientProps {
   isAdmin: boolean;
   firstName: string;
+  projects: ProjectWithImages[];
 }
 
 const fadeInUp: Variants = {
@@ -31,7 +34,7 @@ const scaleIn: Variants = {
   visible: { opacity: 1, scale: 1, transition: { duration: 1, ease: [0.22, 1, 0.36, 1] } }
 };
 
-export default function HomeClient({ isAdmin, firstName }: HomeClientProps) {
+export default function HomeClient({ isAdmin, firstName, projects }: HomeClientProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
@@ -50,15 +53,15 @@ export default function HomeClient({ isAdmin, firstName }: HomeClientProps) {
         <div className="mx-auto max-w-7xl">
           <div className="flex items-center justify-between rounded-2xl border border-[#3d4d43]/30 bg-[#0a0f0d]/80 px-6 py-4 shadow-2xl backdrop-blur-xl">
             <h1 className="font-display text-lg tracking-tight text-[#f5f3f0] sm:text-xl">
-              Alex Morgan <span className="ml-2 text-[#6b8e6f]">•</span>
+              Exemple BTP <span className="ml-2 text-[#6b8e6f]">•</span>
             </h1>
 
             <div className="flex items-center gap-6">
               <a href="#portfolio" className="hidden text-sm text-[#f5f3f0]/70 transition-colors hover:text-[#f5f3f0] sm:block">
-                Portfolio
+                Nos projets
               </a>
               <a href="#about" className="hidden text-sm text-[#f5f3f0]/70 transition-colors hover:text-[#f5f3f0] sm:block">
-                About
+                À propos
               </a>
               <a href="#contact" className="hidden text-sm text-[#f5f3f0]/70 transition-colors hover:text-[#f5f3f0] sm:block">
                 Contact
@@ -70,17 +73,12 @@ export default function HomeClient({ isAdmin, firstName }: HomeClientProps) {
                     href="/dashboard"
                     className="rounded-lg border border-[#6b8e6f]/30 bg-[#6b8e6f]/10 px-3 py-1.5 text-xs text-[#6b8e6f] transition-all hover:bg-[#6b8e6f]/20"
                   >
-                    Dashboard
+                    Gérer les projets
                   </Link>
                   <SignOutButton className="text-xs text-[#f5f3f0]/50 hover:text-[#f5f3f0]" />
                 </div>
               ) : (
-                <Link
-                  href="/login"
-                  className="text-xs text-[#f5f3f0]/50 transition-colors hover:text-[#f5f3f0]"
-                >
-                  Admin
-                </Link>
+               <></>
               )}
             </div>
           </div>
@@ -111,17 +109,23 @@ export default function HomeClient({ isAdmin, firstName }: HomeClientProps) {
           className="relative z-10 mx-auto max-w-5xl px-6 text-center sm:px-8"
         >
           <motion.p variants={fadeInUp} className="mb-6 font-display text-sm tracking-[0.3em] text-[#6b8e6f] sm:text-base">
-            LANDSCAPE ARTIST
+            EXEMPLE BTP
           </motion.p>
           
-          <motion.h2 variants={fadeInUp} className="mb-8 font-display text-5xl leading-[1.1] tracking-tight text-[#f5f3f0] sm:text-6xl md:text-7xl lg:text-8xl">
-            Where Earth
+            <motion.h2 variants={fadeInUp} className="mb-8 font-display text-5xl leading-[1.1] tracking-tight text-[#f5f3f0] sm:text-6xl md:text-7xl lg:text-8xl">
+            Le batîment 
             <br />
-            Meets <span className="italic text-[#6b8e6f]">Artistry</span>
-          </motion.h2>
+            <div className="relative inline-flex items-center gap-2">
+              <div className=" flex flex-col justify-center">
+                <span className="block leading-none text-3xl sm:text-5xl">par des</span>
+                <span className="block leading-none text-3xl sm:text-5xl">pour des</span>
+              </div>
+              <span className="italic text-[#6b8e6f]">Pro</span>
+            </div>
+            </motion.h2>
           
           <motion.p variants={fadeInUp} className="mx-auto mb-12 max-w-2xl text-base leading-relaxed text-[#f5f3f0]/70 sm:text-lg">
-            Capturing the sublime beauty of nature through the lens. Each landscape tells a story of light, texture, and timeless moments frozen in time.
+              experts du BTP à votre service pour tous vos projets de construction, rénovation et aménagement. Avec plus de 20 ans d'expérience, nous sommes votre partenaire de confiance pour concrétiser vos idées en réalité.
           </motion.p>
 
           <motion.div variants={fadeInUp} className="flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -130,7 +134,7 @@ export default function HomeClient({ isAdmin, firstName }: HomeClientProps) {
               className="group relative overflow-hidden rounded-full bg-[#6b8e6f] px-8 py-4 text-sm font-medium text-[#0a0f0d] transition-all hover:bg-[#7a9d7e] hover:shadow-[0_0_40px_-10px_rgba(107,142,111,0.6)]"
             >
               <span className="relative z-10 flex items-center gap-2">
-                View Portfolio
+                Voir nos projets
                 <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
@@ -140,7 +144,7 @@ export default function HomeClient({ isAdmin, firstName }: HomeClientProps) {
               href="#contact"
               className="rounded-full border border-[#3d4d43] bg-[#0a0f0d]/50 px-8 py-4 text-sm font-medium text-[#f5f3f0] backdrop-blur-sm transition-all hover:border-[#6b8e6f]/50 hover:bg-[#2d3c33]/50"
             >
-              Get in Touch
+              Nous contacter
             </a>
           </motion.div>
 
@@ -170,34 +174,34 @@ export default function HomeClient({ isAdmin, firstName }: HomeClientProps) {
 
             {/* Bio */}
             <motion.div variants={fadeInUp} className="flex flex-col justify-center">
-              <motion.p variants={fadeInUp} className="mb-4 font-display text-sm tracking-[0.3em] text-[#6b8e6f]">ABOUT THE ARTIST</motion.p>
+              <motion.p variants={fadeInUp} className="mb-4 font-display text-sm tracking-[0.3em] text-[#6b8e6f]">À propos de l'entreprise</motion.p>
               <h2 className="mb-6 font-display text-4xl tracking-tight text-[#f5f3f0] sm:text-5xl lg:text-6xl">
-                Inspired by Nature&apos;s Grand Theatre
+                Une passion pour la construction durable et l'innovation
               </h2>
               <div className="space-y-6 text-base leading-relaxed text-[#f5f3f0]/70 sm:text-lg">
                 <p>
-                  For over a decade, I&apos;ve traveled to remote corners of the world, seeking moments where light dances across landscapes in ways that stop time itself.
+                  Depuis plus de 20 ans, notre enterprise réalise des chantiers de travaux publics et privés, en mettant l'accent sur la qualité, la durabilité et la satisfaction client. Nous croyons que chaque projet est une opportunité de créer quelque chose de durable et d'impactant pour les générations à venir.
                 </p>
                 <p>
-                  My work explores the intersection of natural beauty and human emotion—capturing not just what I see, but what I feel in the presence of mountains, valleys, and endless horizons.
+                  La qualité de notre travail repose sur une équipe d'experts passionnés, des méthodes de construction innovantes et un engagement envers les pratiques durables. Nous sommes fiers de notre héritage et de notre contribution à la transformation du paysage urbain et rural.
                 </p>
                 <p>
-                  Each photograph is an invitation to pause, breathe, and reconnect with the wild spaces that ground us.
+                  Tout nos chantiers sont réalisés en Bretagne, avec des artisans Bretons, et avec des matériaux locaux. Nous sommes profondément enracinés dans notre communauté et nous nous engageons à soutenir l'économie locale tout en créant des espaces qui inspirent et améliorent la vie de nos clients.
                 </p>
               </div>
 
               <div className="mt-8 flex flex-wrap gap-6 border-t border-[#3d4d43]/30 pt-8">
                 <div>
-                  <p className="text-2xl font-medium text-[#6b8e6f]">150+</p>
-                  <p className="text-sm text-[#f5f3f0]/50">Exhibitions</p>
+                  <p className="text-2xl font-medium text-[#6b8e6f]">Plus de 150 </p>
+                  <p className="text-sm text-[#f5f3f0]/50">Chantiers en cours en Bretagne</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-medium text-[#6b8e6f]">25+</p>
-                  <p className="text-sm text-[#f5f3f0]/50">Awards</p>
+                  <p className="text-2xl font-medium text-[#6b8e6f]">Plus de 20</p>
+                  <p className="text-sm text-[#f5f3f0]/50">Années d'expérience</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-medium text-[#6b8e6f]">500+</p>
-                  <p className="text-sm text-[#f5f3f0]/50">Prints Sold</p>
+                  <p className="text-2xl font-medium text-[#6b8e6f]">Plus de 500</p>
+                  <p className="text-sm text-[#f5f3f0]/50">Chantiers terminés en Bretagne</p>
                 </div>
               </div>
             </motion.div>
@@ -216,59 +220,98 @@ export default function HomeClient({ isAdmin, firstName }: HomeClientProps) {
             className="mb-20 text-center"
           >
             <motion.p variants={fadeInUp} className="mb-4 font-display text-sm tracking-[0.3em] text-[#6b8e6f]">
-              FEATURED WORK
+              Jetez un coup d'oeil à nos projets récents
             </motion.p>
             <motion.h2 variants={fadeInUp} className="font-display text-4xl tracking-tight text-[#f5f3f0] sm:text-5xl lg:text-6xl">
-              Portfolio
+              Nos projets
             </motion.h2>
           </motion.div>
 
           {/* Masonry Grid */}
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-            variants={staggerContainer}
-            className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-          >
-            {[
-              { title: "Misty Mountain Dawn", location: "Swiss Alps", aspect: "aspect-[4/5]" },
-              { title: "Golden Hour Valley", location: "Yosemite", aspect: "aspect-[4/3]" },
-              { title: "Northern Lights", location: "Iceland", aspect: "aspect-square" },
-              { title: "Desert Dunes", location: "Sahara", aspect: "aspect-[3/4]" },
-              { title: "Coastal Serenity", location: "Big Sur", aspect: "aspect-[4/3]" },
-              { title: "Forest Path", location: "Pacific Northwest", aspect: "aspect-[4/5]" },
-            ].map((item, i) => (
-              <motion.article
-                key={i}
-                variants={scaleIn}
-                whileHover={{ y: -8 }}
-                className="group relative overflow-hidden rounded-2xl border border-[#3d4d43]/20 bg-[#1a2520] transition-all hover:border-[#6b8e6f]/30 hover:shadow-2xl hover:shadow-[#6b8e6f]/10"
-              >
-                <div className={`${item.aspect} w-full overflow-hidden bg-gradient-to-br from-[#2d3c33] to-[#1a2520]`}>
-                  {/* Placeholder - replace with actual images */}
-                  <div className="flex h-full items-center justify-center transition-transform duration-700 group-hover:scale-110">
-                    <p className="text-[#f5f3f0]/20">Landscape {i + 1}</p>
-                  </div>
-                </div>
-                
-                {/* Overlay */}
-                <div className="image-overlay absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                
-                {/* Info */}
-                <div className="absolute bottom-0 left-0 right-0 translate-y-4 p-6 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                  <h3 className="mb-1 font-display text-xl text-[#f5f3f0]">{item.title}</h3>
-                  <p className="flex items-center gap-2 text-sm text-[#6b8e6f]">
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    {item.location}
-                  </p>
-                </div>
-              </motion.article>
-            ))}
-          </motion.div>
+          {projects.length === 0 ? (
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeInUp}
+              className="col-span-full text-center py-20"
+            >
+              <div className="mx-auto max-w-md">
+                <svg
+                  className="mx-auto h-24 w-24 text-[#6b8e6f]/30 mb-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+                <h3 className="font-display text-2xl text-[#f5f3f0] mb-3">Pas de projets disponibles</h3>
+                <p className="text-[#f5f3f0]/60">
+                  Nous travaillons dur pour ajouter de nouveaux projets à notre portfolio. Restez à l'écoute pour découvrir nos dernières réalisations en matière de construction et de rénovation.
+                </p>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
+              variants={staggerContainer}
+              className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+            >
+              {projects.map((project, i) => {
+                const imageUrl = getProjectImageUrl(project);
+                // Vary aspect ratios for visual interest
+                const aspects = ["aspect-[4/5]", "aspect-[4/3]", "aspect-square", "aspect-[3/4]"];
+                const aspect = aspects[i % aspects.length];
+
+                return (
+                  <motion.article
+                    key={project.id}
+                    variants={scaleIn}
+                    whileHover={{ y: -8 }}
+                    className="group relative overflow-hidden rounded-2xl border border-[#3d4d43]/20 bg-[#1a2520] transition-all hover:border-[#6b8e6f]/30 hover:shadow-2xl hover:shadow-[#6b8e6f]/10"
+                  >
+                    <div className={`${aspect} w-full overflow-hidden bg-gradient-to-br from-[#2d3c33] to-[#1a2520]`}>
+                      {imageUrl ? (
+                        <img
+                          src={imageUrl}
+                          alt={project.title}
+                          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        />
+                      ) : (
+                        <div className="flex h-full items-center justify-center transition-transform duration-700 group-hover:scale-110">
+                          <p className="text-[#f5f3f0]/20">Pas d'image disponible</p>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Overlay */}
+                    <div className="image-overlay absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                    
+                    {/* Info */}
+                    <div className="absolute bottom-0 left-0 right-0 translate-y-4 p-6 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                      <h3 className="mb-1 font-display text-xl text-[#f5f3f0]">{project.title}</h3>
+                      {project.location && (
+                        <p className="flex items-center gap-2 text-sm text-[#6b8e6f]">
+                          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          {project.location}
+                        </p>
+                      )}
+                    </div>
+                  </motion.article>
+                );
+              })}
+            </motion.div>
+          )}
 
           <motion.div
             initial={{ opacity: 0 }}
@@ -282,7 +325,7 @@ export default function HomeClient({ isAdmin, firstName }: HomeClientProps) {
               href="/portfolio"
               className="inline-flex items-center gap-2 rounded-full border border-[#6b8e6f]/30 bg-[#6b8e6f]/10 px-6 py-3 text-sm font-medium text-[#6b8e6f] transition-all hover:border-[#6b8e6f]/50 hover:bg-[#6b8e6f]/20"
             >
-              View Full Collection
+              Voir la galerie entière
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
@@ -302,10 +345,10 @@ export default function HomeClient({ isAdmin, firstName }: HomeClientProps) {
             className="mb-20 text-center"
           >
             <motion.p variants={fadeInUp} className="mb-4 font-display text-sm tracking-[0.3em] text-[#6b8e6f]">
-              WHAT I OFFER
+              CE QUE NOUS OFFRONS
             </motion.p>
             <motion.h2 variants={fadeInUp} className="font-display text-4xl tracking-tight text-[#f5f3f0] sm:text-5xl lg:text-6xl">
-              Services
+              Nos services
             </motion.h2>
           </motion.div>
 
@@ -377,10 +420,10 @@ export default function HomeClient({ isAdmin, firstName }: HomeClientProps) {
             className="mb-20 text-center"
           >
             <motion.p variants={fadeInUp} className="mb-4 font-display text-sm tracking-[0.3em] text-[#6b8e6f]">
-              MY APPROACH
+              NOTRE APPROCHE
             </motion.p>
             <motion.h2 variants={fadeInUp} className="font-display text-4xl tracking-tight text-[#f5f3f0] sm:text-5xl lg:text-6xl">
-              The Creative Process
+              Une approche créative
             </motion.h2>
           </motion.div>
 
@@ -426,10 +469,10 @@ export default function HomeClient({ isAdmin, firstName }: HomeClientProps) {
             className="mb-20 text-center"
           >
             <motion.p variants={fadeInUp} className="mb-4 font-display text-sm tracking-[0.3em] text-[#6b8e6f]">
-              KIND WORDS
+              DES CLIENTS SATISFAITS
             </motion.p>
             <motion.h2 variants={fadeInUp} className="font-display text-4xl tracking-tight text-[#f5f3f0] sm:text-5xl lg:text-6xl">
-              Client Testimonials
+              Ce que les clients disent de nous
             </motion.h2>
           </motion.div>
 
@@ -443,18 +486,18 @@ export default function HomeClient({ isAdmin, firstName }: HomeClientProps) {
             {[
               { 
                 quote: "The attention to detail and emotional depth in every photograph is extraordinary. The print we commissioned has become the centerpiece of our home.",
-                author: "Sarah Williams",
-                role: "Private Collector"
+                author: "Exemple Paysages",
+                role: "Paysages Bretons"
               },
               { 
                 quote: "Working with Alex was an absolute pleasure. The final images exceeded our expectations and perfectly captured the essence of our brand's connection to nature.",
-                author: "Michael Chen",
-                role: "Creative Director, EcoLux"
+                author: "Exemple Peintre",
+                role: "Peintre Breton"
               },
               { 
                 quote: "Each piece tells a story that resonates deeply. The craftsmanship and artistic vision are unparalleled. A true master of the craft.",
-                author: "Emma Thompson",
-                role: "Gallery Owner"
+                author: "Exemple Menuiserie",
+                role: "Menuiserie Bretonne"
               },
             ].map((testimonial, i) => (
               <motion.article
@@ -535,7 +578,10 @@ export default function HomeClient({ isAdmin, firstName }: HomeClientProps) {
         <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
           <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
             <p className="text-sm text-[#f5f3f0]/40">
-              © {new Date().getFullYear()} Alex Morgan. All rights reserved.
+              © {new Date().getFullYear()}  <Link
+                  href="/login">
+                  Alex Morgan
+                </Link>. All rights reserved.
             </p>
             <div className="flex gap-8 text-sm">
               <a href="#" className="text-[#f5f3f0]/40 transition-colors hover:text-[#6b8e6f]">
