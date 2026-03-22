@@ -17,23 +17,26 @@ export function ProjectCard({ project, imageUrl, index, onClick }: ProjectCardPr
 
   // Vary aspect ratios for visual interest
   const aspects = ["aspect-[4/5]", "aspect-[4/3]", "aspect-square", "aspect-[3/4]"];
-  const aspect = aspects[index % aspects.length];
+  const aspect = aspects[0];
 
   return (
     <motion.article
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       whileHover={{ y: -8 }}
       onClick={onClick}
       className="group relative cursor-pointer overflow-hidden rounded-2xl border border-[#d1cdc7] bg-white shadow-md transition-all hover:border-[#d4a574] hover:shadow-2xl hover:shadow-[#d4a574]/20"
     >
       {/* Image Container with Fixed Aspect Ratio */}
-      <div className={`${aspect} relative w-full overflow-hidden bg-gradient-to-br from-[#e8e4de] to-[#faf8f5]`}>
+      <div className={`${aspect} relative w-full overflow-hidden bg-linear-to-br from-[#e8e4de] to-[#faf8f5]`}>
         {/* Skeleton Loader */}
-        {!imageLoaded && !imageError && (
-          <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-[#e8e4de] via-[#d1cdc7] to-[#e8e4de] bg-[length:200%_100%]" 
-               style={{ animation: 'shimmer 1.5s infinite' }} 
+        {imageUrl && !imageError && (
+          <div
+            className={`pointer-events-none absolute inset-0 z-10 animate-pulse bg-linear-to-r from-[#e8e4de] via-[#d1cdc7] to-[#e8e4de] bg-size-[200%_100%] transition-opacity duration-300 ${
+              imageLoaded ? "opacity-0" : "opacity-100"
+            }`}
+            style={{ animation: "shimmer 1.5s infinite" }}
           />
         )}
 
@@ -43,13 +46,14 @@ export function ProjectCard({ project, imageUrl, index, onClick }: ProjectCardPr
             src={imageUrl}
             alt={project.title}
             loading="lazy"
+            decoding="async"
             onLoad={() => setImageLoaded(true)}
             onError={() => {
               setImageError(true);
               setImageLoaded(true);
             }}
-            className={`h-full w-full object-cover transition-all duration-700 group-hover:scale-110 ${
-              imageLoaded ? 'opacity-100' : 'opacity-0'
+            className={`h-full w-full object-cover transition-[opacity,transform] duration-500 will-change-transform group-hover:scale-110 ${
+              imageLoaded ? "opacity-100" : "opacity-0"
             }`}
           />
         ) : (

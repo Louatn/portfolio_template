@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion, useScroll, useTransform, Variants } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { loadPublicProjectsData, type PublicProject } from "@/lib/public-project-session";
@@ -145,10 +146,14 @@ export default function HomeClient() {
             {/* Portrait */}
             <motion.div variants={scaleIn} className="relative">
               <div className="aspect-[3/4] overflow-hidden rounded-3xl border border-[#3d4d43]/30 bg-gradient-to-br from-[#2d3c33] to-[#1a2520]">
-                {/* Placeholder for artist portrait */}
-                <div className="flex h-full items-center justify-center">
-                  <p className="text-[#f5f3f0]/30">Artist Portrait</p>
-                </div>
+                <Image
+                  src="/artisan.png"
+                  alt="Portrait artisan"
+                  width={900}
+                  height={1200}
+                  className="h-full w-full object-cover"
+                  priority={false}
+                />
               </div>
               <div className="absolute -bottom-6 -right-6 -z-10 h-full w-full rounded-3xl bg-[#6b8e6f]/10 blur-3xl" />
             </motion.div>
@@ -312,34 +317,34 @@ export default function HomeClient() {
           >
             {[
               {
-                title: "Fine Art Prints",
-                desc: "Museum-quality giclée prints on archival paper or canvas. Each piece is signed, numbered, and comes with a certificate of authenticity.",
-                icon: "M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                title: "Construction Neuve",
+                desc: "Realisation de maisons individuelles, locaux professionnels et extensions avec pilotage complet du chantier, des fondations aux finitions.",
+                icon: "M3 10.5L12 3l9 7.5M5.25 9.75V20.25h13.5V9.75M9 20.25v-6h6v6"
               },
               {
-                title: "Limited Editions",
-                desc: "Exclusive limited edition series, available in carefully curated quantities. Collectible pieces for the discerning art enthusiast.",
-                icon: "M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+                title: "Renovation Interieure",
+                desc: "Reconfiguration des espaces, isolation, cloisons, sols, plafonds et remise a neuf pour moderniser durablement votre habitat ou vos bureaux.",
+                icon: "M4.5 21V7.5A1.5 1.5 0 016 6h12a1.5 1.5 0 011.5 1.5V21M9 21v-6.75A2.25 2.25 0 0111.25 12h1.5A2.25 2.25 0 0115 14.25V21M8.25 9.75h7.5"
               },
               {
-                title: "Commissioned Work",
-                desc: "Custom landscape photography for specific locations or themes. I'll work with you to capture the perfect scene that speaks to your vision.",
-                icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                title: "Terrassement et VRD",
+                desc: "Preparation des terrains, reseaux, evacuations et raccordements pour garantir des bases solides et conformes avant construction.",
+                icon: "M2.25 16.5h19.5M3.75 16.5l2.25-6h12l2.25 6M8.25 10.5V7.875A1.875 1.875 0 0110.125 6h3.75A1.875 1.875 0 0115.75 7.875V10.5"
               },
               {
-                title: "Exhibitions",
-                desc: "Available for gallery shows, public exhibitions, and private viewings. Past exhibitions in renowned galleries worldwide.",
-                icon: "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                title: "Maçonnerie Generale",
+                desc: "Murs porteurs, dalles, ouvertures, reprises structurelles et ouvrages en beton pour les projets neufs ou en rehabilitation.",
+                icon: "M3 7.5h18M3 12h18M3 16.5h18M6.75 7.5v9M12 7.5v9M17.25 7.5v9"
               },
               {
-                title: "Licensing",
-                desc: "Commercial licensing available for publications, advertising, and corporate use. Rights-managed and royalty-free options.",
-                icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                title: "Amelioration Energetique",
+                desc: "Isolation thermique, remplacement de menuiseries, et optimisation des performances pour reduire durablement vos consommations.",
+                icon: "M12 3v3m0 12v3m9-9h-3M6 12H3m15.364 6.364l-2.121-2.121M8.757 8.757L6.636 6.636m11.728 0l-2.121 2.121M8.757 15.243l-2.121 2.121M12 16.5A4.5 4.5 0 1012 7.5a4.5 4.5 0 000 9z"
               },
               {
-                title: "Workshops",
-                desc: "Private and group photography workshops in stunning locations. Learn the art of landscape photography from planning to post-processing.",
-                icon: "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                title: "Maintenance et SAV",
+                desc: "Interventions rapides, contrats d'entretien et suivi apres chantier pour maintenir vos installations en parfait etat dans la duree.",
+                icon: "M10.5 6h3m-6.75 3h10.5m-9 3h7.5m-8.25 9h8.25A2.25 2.25 0 0018 18.75V5.25A2.25 2.25 0 0015.75 3H8.25A2.25 2.25 0 006 5.25v13.5A2.25 2.25 0 008.25 21z"
               },
             ].map((service, i) => (
               <motion.article
