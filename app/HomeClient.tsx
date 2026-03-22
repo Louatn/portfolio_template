@@ -6,6 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import { loadPublicProjectsData, type PublicProject } from "@/lib/public-project-session";
 import { getProjectImageUrl } from "@/lib/utils/image-helpers";
 import { ProjectDetailModal } from "@/components/ProjectDetailModal";
+import { Header } from "@/components/Header";
+import { ProjectCard } from "@/components/ProjectCard.public";
 
 const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 40 },
@@ -245,52 +247,18 @@ export default function HomeClient() {
             >
               {projects.map((project, i) => {
                 const imageUrl = getProjectImageUrl(project);
-                // Vary aspect ratios for visual interest
-                const aspects = ["aspect-[4/5]", "aspect-[4/3]", "aspect-square", "aspect-[3/4]"];
-                const aspect = aspects[i % aspects.length];
 
                 return (
-                  <motion.article
+                  <ProjectCard
                     key={project.id}
-                    variants={scaleIn}
-                    whileHover={{ y: -8 }}
+                    project={project}
+                    imageUrl={imageUrl}
+                    index={i}
                     onClick={() => {
                       setSelectedProject(project);
                       setIsModalOpen(true);
                     }}
-                    className="group relative cursor-pointer overflow-hidden rounded-2xl border border-[#3d4d43]/20 bg-[#1a2520] transition-all hover:border-[#6b8e6f]/30 hover:shadow-2xl hover:shadow-[#6b8e6f]/10"
-                  >
-                    <div className={`${aspect} w-full overflow-hidden bg-gradient-to-br from-[#2d3c33] to-[#1a2520]`}>
-                      {imageUrl ? (
-                        <img
-                          src={imageUrl}
-                          alt={project.title}
-                          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        />
-                      ) : (
-                        <div className="flex h-full items-center justify-center transition-transform duration-700 group-hover:scale-110">
-                          <p className="text-[#f5f3f0]/20">Pas d'image disponible</p>
-                        </div>
-                      )}
-                    </div>
-                    
-                    {/* Overlay */}
-                    <div className="image-overlay absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                    
-                    {/* Info */}
-                    <div className="absolute bottom-0 left-0 right-0 translate-y-4 p-6 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                      <h3 className="mb-1 font-display text-xl text-[#f5f3f0]">{project.title}</h3>
-                      {project.location && (
-                        <p className="flex items-center gap-2 text-sm text-[#6b8e6f]">
-                          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                          </svg>
-                          {project.location}
-                        </p>
-                      )}
-                    </div>
-                  </motion.article>
+                  />
                 );
               })}
             </motion.div>

@@ -68,3 +68,23 @@ html {
     rgba(10, 15, 13, 0.9) 100%
   );
 }
+
+/* Wood grain accent effect for artisan theme */
+.wood-accent {
+  background: linear-gradient(
+    90deg,
+    rgba(212, 165, 116, 0.1) 0%,
+    rgba(198, 123, 92, 0.1) 50%,
+    rgba(212, 165, 116, 0.1) 100%
+  );
+}
+
+/* Shimmer animation for image loading */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
