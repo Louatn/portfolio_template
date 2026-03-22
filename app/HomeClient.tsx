@@ -31,6 +31,18 @@ const scaleIn: Variants = {
   visible: { opacity: 1, scale: 1, transition: { duration: 1, ease: [0.22, 1, 0.36, 1] } }
 };
 
+const backdropBlur: Variants = {
+  hidden: { opacity: 0 },
+  visible: { 
+    opacity: 1, 
+    transition: { 
+      duration: 1.2, 
+      delay: 1.3,
+      ease: [0.22, 1, 0.36, 1] 
+    } 
+  }
+};
+
 export default function HomeClient() {
   const containerRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
@@ -40,6 +52,8 @@ export default function HomeClient() {
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.5, 1], [1, 0.8, 0.3]);
+  const blurOverlayOpacity = useTransform(scrollYProgress, [0, 1], [0, 1]);
+  const blurOverlayFilter = useTransform(scrollYProgress, [0, 1], ["blur(0px)", "blur(14px)"]);
 
   useEffect(() => {
     let isActive = true;
@@ -74,63 +88,101 @@ export default function HomeClient() {
           style={{ y, opacity }}
           className="absolute inset-0 z-0"
         >
-          {/* Placeholder landscape gradient - replace with actual image */}
-          <div className="absolute inset-0 bg-gradient-to-br from-[#2d3c33] via-[#1a2520] to-[#0a0f0d]" />
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxwYXR0ZXJuIGlkPSJhIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiPjxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjEiIGZpbGw9IiNmNWYzZjAiIG9wYWNpdHk9IjAuMDUiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjYSkiLz48L3N2Zz4=')] opacity-40" />
+          <div className="absolute inset-0">
+            <Image
+              src="/entreprise.png"
+              alt=""
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
+            />
+          </div>
+
+          <motion.div
+            style={{
+              opacity: blurOverlayOpacity,
+              filter: blurOverlayFilter,
+              maskImage: "linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.25) 30%, black 100%)",
+              WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.25) 30%, black 100%)",
+            }}
+            className="absolute inset-0"
+          >
+            <Image
+              src="/entreprise.png"
+              alt=""
+              fill
+              priority
+              sizes="100vw"
+              className="scale-105 object-cover"
+            />
+          </motion.div>
           
-          {/* Vignette overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f0d] via-transparent to-[#0a0f0d]/40" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0a0f0d]/60 via-transparent to-[#0a0f0d]/60" />
+          {/* Vignette overlay - Enhanced for better text contrast */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f0d]/95 via-[#0a0f0d]/30 to-[#0a0f0d]/60" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0a0f0d]/70 via-transparent to-[#0a0f0d]/70" />
+          <div className="absolute inset-0 bg-black/30" />
         </motion.div>
 
         {/* Hero Content */}
-        <motion.div 
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
-          className="relative z-10 mx-auto max-w-5xl px-6 text-center sm:px-8"
-        >
-          <motion.p variants={fadeInUp} className="mb-6 font-display text-sm tracking-[0.3em] text-[#6b8e6f] sm:text-base">
-            EXEMPLE BTP
-          </motion.p>
+        <div className="relative z-10 mx-auto max-w-5xl px-6 text-center sm:px-8">
           
-            <motion.h2 variants={fadeInUp} className="mb-8 font-display text-5xl leading-[1.1] tracking-tight text-[#f5f3f0] sm:text-6xl md:text-7xl lg:text-8xl">
-            Le batîment 
-            <br />
-            <div className="relative inline-flex items-center gap-2">
-              <div className=" flex flex-col justify-center">
-                <span className="block leading-none text-3xl sm:text-5xl">par des</span>
-                <span className="block leading-none text-3xl sm:text-5xl">pour des</span>
+          {/* Text Content with enhanced readability */}
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+            className="relative"
+          >
+            {/* Dark backdrop for text - appears after animation */}
+            <motion.div 
+              variants={backdropBlur}
+              initial="hidden"
+              animate="visible"
+              className="absolute inset-x-0 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120vw] h-[110%] bg-gradient-to-b from-black/70 via-black/80 to-black/70 rounded-[3rem] blur-3xl"
+            />
+
+            <motion.p variants={fadeInUp} className="relative mb-6 font-display text-sm tracking-[0.3em] text-[#6b8e6f] sm:text-base drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+              EXEMPLE BTP
+            </motion.p>
+            
+              <motion.h2 variants={fadeInUp} className="relative mb-8 font-display text-5xl leading-[1.1] tracking-tight text-[#f5f3f0] sm:text-6xl md:text-7xl lg:text-8xl drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
+              Le batîment 
+              <br />
+              <div className="relative inline-flex items-center gap-2">
+                <div className=" flex flex-col justify-center">
+                  <span className="block leading-none text-3xl sm:text-5xl">par des</span>
+                  <span className="block leading-none text-3xl sm:text-5xl">pour des</span>
+                </div>
+                <span className="italic text-[#6b8e6f]">Pro</span>
               </div>
-              <span className="italic text-[#6b8e6f]">Pro</span>
-            </div>
-            </motion.h2>
-          
-          <motion.p variants={fadeInUp} className="mx-auto mb-12 max-w-2xl text-base leading-relaxed text-[#f5f3f0]/70 sm:text-lg">
-              experts du BTP à votre service pour tous vos projets de construction, rénovation et aménagement. Avec plus de 20 ans d'expérience, nous sommes votre partenaire de confiance pour concrétiser vos idées en réalité.
-          </motion.p>
+              </motion.h2>
+            
+            <motion.p variants={fadeInUp} className="relative mx-auto mb-12 max-w-2xl text-base leading-relaxed text-[#f5f3f0]/90 sm:text-lg drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+                experts du BTP à votre service pour tous vos projets de construction, rénovation et aménagement. Avec plus de 20 ans d'expérience, nous sommes votre partenaire de confiance pour concrétiser vos idées en réalité.
+            </motion.p>
 
-          <motion.div variants={fadeInUp} className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <a
-              href="#portfolio"
-              className="group relative overflow-hidden rounded-full bg-[#6b8e6f] px-8 py-4 text-sm font-medium text-[#0a0f0d] transition-all hover:bg-[#7a9d7e] hover:shadow-[0_0_40px_-10px_rgba(107,142,111,0.6)]"
-            >
-              <span className="relative z-10 flex items-center gap-2">
-                Voir nos projets
-                <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </span>
-            </a>
-            <a
-              href="#contact"
-              className="rounded-full border border-[#3d4d43] bg-[#0a0f0d]/50 px-8 py-4 text-sm font-medium text-[#f5f3f0] backdrop-blur-sm transition-all hover:border-[#6b8e6f]/50 hover:bg-[#2d3c33]/50"
-            >
-              Nous contacter
-            </a>
+            <motion.div variants={fadeInUp} className="relative flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <a
+                href="#portfolio"
+                className="group relative overflow-hidden rounded-full bg-[#6b8e6f] px-8 py-4 text-sm font-medium text-[#0a0f0d] transition-all hover:bg-[#7a9d7e] hover:shadow-[0_0_40px_-10px_rgba(107,142,111,0.6)]"
+              >
+                <span className="relative z-10 flex items-center gap-2">
+                  Voir nos projets
+                  <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </span>
+              </a>
+              <a
+                href="#contact"
+                className="rounded-full border border-[#3d4d43] bg-[#0a0f0d]/80 px-8 py-4 text-sm font-medium text-[#f5f3f0] backdrop-blur-sm transition-all hover:border-[#6b8e6f]/50 hover:bg-[#2d3c33]/80 shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
+              >
+                Nous contacter
+              </a>
+            </motion.div>
           </motion.div>
-
-        </motion.div>
+        </div>
       </section>
 
       {/* About Section */}
