@@ -19,7 +19,7 @@ export default function LoginPage() {
       </div>
 
       <div className="relative z-10 w-full max-w-md rounded-3xl border border-slate-800 bg-slate-900/60 p-8 shadow-2xl backdrop-blur-xl">
-        <p className="text-xs font-semibold tracking-[0.2em] text-emerald-400">BREIZH PEINTURE RENOV</p>
+        <p className="text-xs font-semibold tracking-[0.2em] text-emerald-400">CONNEXION</p>
         <h1 className="mt-3 text-4xl font-bold leading-none text-white">Connexion admin</h1>
         <p className="mt-3 text-sm text-slate-400">
           Accès réservé à l'interface dashboard sécurisée.

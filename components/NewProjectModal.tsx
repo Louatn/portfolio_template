@@ -10,6 +10,7 @@ import {
   updateCachedProject,
   type ProjectImageDraft 
 } from "@/lib/project-storage";
+import { syncPublicProjectsCacheWithProject } from "@/lib/public-project-session";
 import { useRouter } from "next/navigation";
 
 interface NewProjectModalProps {
@@ -46,20 +47,65 @@ export function NewProjectModal({ isOpen, onClose, projectId }: NewProjectModalP
   const galleryInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (isOpen && !projectId) {
-      const draft = getProjectDraft();
-      if (draft) {
-        setTitle(draft.title || "");
-        setDescription(draft.description || "");
-        setLocation(draft.location || "");
-        setCategory(draft.category || "");
-        setCapturedAt(draft.capturedAt || "");
-        setCoverImageUrl(draft.coverImage);
-        setGallery(draft.images || []);
-        setIsModified(draft.isModified);
+    if (isOpen) {
+      if (projectId) {
+        // Load existing project for editing
+        loadProjectForEditing(projectId);
+      } else {
+        // Load draft for new project
+        const draft = getProjectDraft();
+        if (draft) {
+          setTitle(draft.title || "");
+          setDescription(draft.description || "");
+          setLocation(draft.location || "");
+          setCategory(draft.category || "");
+          setCapturedAt(draft.capturedAt || "");
+          setCoverImageUrl(draft.coverImage);
+          setGallery(draft.images || []);
+          setIsModified(draft.isModified);
+        }
       }
     }
   }, [isOpen, projectId]);
+
+  const loadProjectForEditing = async (id: string) => {
+    try {
+      const response = await fetch(`/api/projects/${id}`);
+      const result = await response.json();
+      
+      if (result.success && result.data) {
+        const project = result.data;
+        setTitle(project.title || "");
+        setDescription(project.description || "");
+        setLocation(project.location || "");
+        setCategory(project.category || "");
+        setCapturedAt(project.capturedAt ? new Date(project.capturedAt).toISOString().split('T')[0] : "");
+        setCoverImageUrl(project.coverImage || null);
+        
+        // Load gallery images
+        if (project.images && project.images.length > 0) {
+          const loadedImages: ProjectImageDraft[] = project.images.map((img: any, index: number) => ({
+            id: img.id,
+            url: img.url,
+            title: img.title || "",
+            description: img.description || "",
+            position: img.position !== undefined ? img.position : index,
+            width: img.width,
+            height: img.height,
+            size: img.size,
+            uploadStatus: 'completed' as const,
+            uploadProgress: 100,
+          }));
+          setGallery(loadedImages);
+        }
+        
+        setIsModified(false);
+      }
+    } catch (error) {
+      console.error("Error loading project:", error);
+      setSaveError("Erreur lors du chargement du projet");
+    }
+  };
 
   useEffect(() => {
     if (isOpen && isModified && !projectId) {
@@ -236,12 +282,15 @@ export function NewProjectModal({ isOpen, onClose, projectId }: NewProjectModalP
       }
 
       if (result.data) {
-        updateCachedProject({
+        const cachedProject = {
           ...result.data,
           createdAt: result.data.createdAt.toString(),
           updatedAt: result.data.updatedAt.toString(),
           capturedAt: result.data.capturedAt?.toString() || null,
-        });
+        };
+
+        updateCachedProject(cachedProject);
+        syncPublicProjectsCacheWithProject(cachedProject);
       }
 
       clearProjectDraft();

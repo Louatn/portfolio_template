@@ -11,7 +11,7 @@ const createProjectSchema = z.object({
   description: z.string().optional(),
   location: z.string().optional(),
   category: z.string().optional(),
-  capturedAt: z.string().datetime().optional().nullable(),
+  capturedAt: z.string().optional().nullable(),
   coverImage: z.string().url().optional().nullable(),
   status: z.nativeEnum(ProjectStatus).default(ProjectStatus.DRAFT),
   isFeatured: z.boolean().optional().default(false),

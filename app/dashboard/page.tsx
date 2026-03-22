@@ -4,23 +4,31 @@ import React, { useState, useEffect } from "react";
 import { ProjectStatus } from "@prisma/client";
 import { NewProjectModal } from "@/components/NewProjectModal";
 import { ProjectCard } from "@/components/ProjectCard";
+import { NotificationBanner, type Notification } from "@/components/NotificationBanner";
 import { 
   getCachedProjects, 
   cacheProjects, 
   isCacheFresh,
   removeCachedProject,
+  updateCachedProject,
   type CachedProject 
 } from "@/lib/project-storage";
+import {
+  removePublicProjectFromCache,
+  syncPublicProjectsCacheWithProject,
+} from "@/lib/public-project-session";
 
 type FilterType = ProjectStatus | 'ALL';
 
 export default function DashboardPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingProjectId, setEditingProjectId] = useState<string | undefined>(undefined);
   const [projects, setProjects] = useState<CachedProject[]>([]);
   const [filteredProjects, setFilteredProjects] = useState<CachedProject[]>([]);
   const [filter, setFilter] = useState<FilterType>('ALL');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [notification, setNotification] = useState<Notification | null>(null);
 
   // Load projects on mount
   useEffect(() => {
@@ -81,6 +89,14 @@ export default function DashboardPage() {
     }
   };
 
+  const showNotification = (type: Notification['type'], message: string) => {
+    setNotification({
+      id: Date.now().toString(),
+      type,
+      message,
+    });
+  };
+
   const handleArchive = async (id: string) => {
     try {
       const response = await fetch(`/api/projects/${id}`, {
@@ -94,12 +110,28 @@ export default function DashboardPage() {
         throw new Error(result.error);
       }
 
+      const updatedProject: CachedProject | null = result.data
+        ? {
+            ...result.data,
+            createdAt: result.data.createdAt.toString(),
+            updatedAt: result.data.updatedAt.toString(),
+            capturedAt: result.data.capturedAt?.toString() || null,
+          }
+        : null;
+
       // Update local state
       setProjects(prev => prev.map(p => 
         p.id === id ? { ...p, status: ProjectStatus.ARCHIVED } : p
       ));
+
+      if (updatedProject) {
+        updateCachedProject(updatedProject);
+        syncPublicProjectsCacheWithProject(updatedProject);
+      }
+
+      showNotification('success', 'Projet archivé avec succès');
     } catch (err) {
-      alert('Erreur lors de l\'archivage du projet');
+      showNotification('error', 'Erreur lors de l\'archivage du projet');
       console.error(err);
     }
   };
@@ -117,12 +149,67 @@ export default function DashboardPage() {
         throw new Error(result.error);
       }
 
+      const updatedProject: CachedProject | null = result.data
+        ? {
+            ...result.data,
+            createdAt: result.data.createdAt.toString(),
+            updatedAt: result.data.updatedAt.toString(),
+            capturedAt: result.data.capturedAt?.toString() || null,
+          }
+        : null;
+
       // Update local state
       setProjects(prev => prev.map(p => 
         p.id === id ? { ...p, status: ProjectStatus.DRAFT } : p
       ));
+
+      if (updatedProject) {
+        updateCachedProject(updatedProject);
+        syncPublicProjectsCacheWithProject(updatedProject);
+      }
+
+      showNotification('success', 'Projet désarchivé avec succès');
     } catch (err) {
-      alert('Erreur lors de la désarchivage du projet');
+      showNotification('error', 'Erreur lors de la désarchivage du projet');
+      console.error(err);
+    }
+  };
+
+  const handlePublish = async (id: string) => {
+    try {
+      const response = await fetch(`/api/projects/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: ProjectStatus.PUBLISHED }),
+      });
+
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      const updatedProject: CachedProject | null = result.data
+        ? {
+            ...result.data,
+            createdAt: result.data.createdAt.toString(),
+            updatedAt: result.data.updatedAt.toString(),
+            capturedAt: result.data.capturedAt?.toString() || null,
+          }
+        : null;
+
+      // Update local state
+      setProjects(prev => prev.map(p => 
+        p.id === id ? { ...p, status: ProjectStatus.PUBLISHED } : p
+      ));
+
+      if (updatedProject) {
+        updateCachedProject(updatedProject);
+        syncPublicProjectsCacheWithProject(updatedProject);
+      }
+
+      showNotification('success', 'Projet publié avec succès');
+    } catch (err) {
+      showNotification('error', 'Erreur lors de la publication du projet');
       console.error(err);
     }
   };
@@ -141,8 +228,11 @@ export default function DashboardPage() {
       // Remove from local state and cache
       setProjects(prev => prev.filter(p => p.id !== id));
       removeCachedProject(id);
+      removePublicProjectFromCache(id);
+
+      showNotification('success', 'Projet supprimé avec succès');
     } catch (err) {
-      alert('Erreur lors de la suppression du projet');
+      showNotification('error', 'Erreur lors de la suppression du projet');
       console.error(err);
     }
   };
@@ -156,6 +246,11 @@ export default function DashboardPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-12">
+      <NotificationBanner 
+        notification={notification} 
+        onClose={() => setNotification(null)} 
+      />
+      
       <header className="mb-10 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold text-white">Gestion des Projets</h1>
@@ -166,14 +261,10 @@ export default function DashboardPage() {
         
         <div className="flex gap-3">
           <button
-            onClick={() => loadProjects()}
-            className="rounded-full bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Chargement...' : '🔄 Actualiser'}
-          </button>
-          <button
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              setEditingProjectId(undefined);
+              setIsModalOpen(true);
+            }}
             className="rounded-full bg-(--site-gold) px-6 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-(--site-gold)/20"
           >
             + Nouveau projet
@@ -243,7 +334,7 @@ export default function DashboardPage() {
           </div>
         ) : filteredProjects.length === 0 ? (
           <div className="flex min-h-[400px] flex-col items-center justify-center rounded-3xl border border-white/10 bg-white/5 p-8 text-center backdrop-blur-sm">
-            <svg className="mb-4 h-16 w-16 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="mb-4 h-8 w-8 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
             </svg>
             <h2 className="text-xl font-medium text-white">
@@ -267,12 +358,13 @@ export default function DashboardPage() {
                 key={project.id}
                 project={project}
                 onEdit={(id) => {
-                  // TODO: Implement edit functionality
-                  console.log('Edit project', id);
+                  setEditingProjectId(id);
+                  setIsModalOpen(true);
                 }}
                 onDelete={handleDelete}
                 onArchive={handleArchive}
                 onUnarchive={handleUnarchive}
+                onPublish={handlePublish}
               />
             ))}
           </div>
@@ -281,8 +373,10 @@ export default function DashboardPage() {
 
       <NewProjectModal 
         isOpen={isModalOpen} 
+        projectId={editingProjectId}
         onClose={() => {
           setIsModalOpen(false);
+          setEditingProjectId(undefined);
           // Refresh projects after closing modal
           loadProjects();
         }} 

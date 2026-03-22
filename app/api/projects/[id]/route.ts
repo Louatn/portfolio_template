@@ -11,7 +11,7 @@ const updateProjectSchema = z.object({
   description: z.string().optional().nullable(),
   location: z.string().optional().nullable(),
   category: z.string().optional().nullable(),
-  capturedAt: z.string().datetime().optional().nullable(),
+  capturedAt: z.string().optional().nullable(),
   coverImage: z.string().url().optional().nullable(),
   status: z.nativeEnum(ProjectStatus).optional(),
   isFeatured: z.boolean().optional(),
@@ -27,6 +27,57 @@ const updateProjectSchema = z.object({
     position: z.number().default(0),
   })).optional(),
 });
+
+/**
+ * GET /api/projects/[id]
+ * Get a single project by ID
+ */
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    // Check authentication
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.isAdmin) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    const { id } = await params;
+
+    // Fetch project with images
+    const project = await prisma.project.findUnique({
+      where: { id },
+      include: {
+        images: {
+          orderBy: { position: 'asc' },
+        },
+      },
+    });
+
+    if (!project) {
+      return NextResponse.json(
+        { success: false, error: 'Project not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(
+      { success: true, data: project },
+      { status: 200 }
+    );
+
+  } catch (error) {
+    console.error('Error fetching project:', error);
+    return NextResponse.json(
+      { success: false, error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
 
 /**
  * PUT /api/projects/[id]

@@ -2,16 +2,9 @@
 
 import Link from "next/link";
 import { motion, useScroll, useTransform, Variants } from "framer-motion";
-import { SignOutButton } from "@/components/SignOutButton";
-import { useRef } from "react";
-import { ProjectWithImages } from "./actions/get-projects";
+import { useEffect, useRef, useState } from "react";
+import { loadPublicProjectsData, type PublicProject } from "@/lib/public-project-session";
 import { getProjectImageUrl } from "@/lib/utils/image-helpers";
-
-interface HomeClientProps {
-  isAdmin: boolean;
-  firstName: string;
-  projects: ProjectWithImages[];
-}
 
 const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 40 },
@@ -34,57 +27,39 @@ const scaleIn: Variants = {
   visible: { opacity: 1, scale: 1, transition: { duration: 1, ease: [0.22, 1, 0.36, 1] } }
 };
 
-export default function HomeClient({ isAdmin, firstName, projects }: HomeClientProps) {
+export default function HomeClient() {
   const containerRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
+  const [projects, setProjects] = useState<PublicProject[]>([]);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.5, 1], [1, 0.8, 0.3]);
 
+  useEffect(() => {
+    let isActive = true;
+
+    const loadProjects = async () => {
+      try {
+        const data = await loadPublicProjectsData();
+        if (!isActive) {
+          return;
+        }
+
+        setProjects(data.featuredProjects);
+      } catch (error) {
+        console.error("Error loading featured projects:", error);
+      }
+    };
+
+    loadProjects();
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
   return (
     <main ref={containerRef} className="relative bg-[#0a0f0d] text-[#f5f3f0] selection:bg-[#6b8e6f]/30">
-      {/* Navigation */}
-      <motion.nav 
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        className="fixed top-0 left-0 right-0 z-50 px-6 pt-6 sm:px-8 lg:px-12"
-      >
-        <div className="mx-auto max-w-7xl">
-          <div className="flex items-center justify-between rounded-2xl border border-[#3d4d43]/30 bg-[#0a0f0d]/80 px-6 py-4 shadow-2xl backdrop-blur-xl">
-            <h1 className="font-display text-lg tracking-tight text-[#f5f3f0] sm:text-xl">
-              Exemple BTP <span className="ml-2 text-[#6b8e6f]">•</span>
-            </h1>
-
-            <div className="flex items-center gap-6">
-              <a href="#portfolio" className="hidden text-sm text-[#f5f3f0]/70 transition-colors hover:text-[#f5f3f0] sm:block">
-                Nos projets
-              </a>
-              <a href="#about" className="hidden text-sm text-[#f5f3f0]/70 transition-colors hover:text-[#f5f3f0] sm:block">
-                À propos
-              </a>
-              <a href="#contact" className="hidden text-sm text-[#f5f3f0]/70 transition-colors hover:text-[#f5f3f0] sm:block">
-                Contact
-              </a>
-              
-              {isAdmin ? (
-                <div className="flex items-center gap-3">
-                  <Link
-                    href="/dashboard"
-                    className="rounded-lg border border-[#6b8e6f]/30 bg-[#6b8e6f]/10 px-3 py-1.5 text-xs text-[#6b8e6f] transition-all hover:bg-[#6b8e6f]/20"
-                  >
-                    Gérer les projets
-                  </Link>
-                  <SignOutButton className="text-xs text-[#f5f3f0]/50 hover:text-[#f5f3f0]" />
-                </div>
-              ) : (
-               <></>
-              )}
-            </div>
-          </div>
-        </div>
-      </motion.nav>
-
       {/* Hero Section */}
       <section ref={heroRef} className="relative flex min-h-screen items-center justify-center overflow-hidden">
         {/* Background Image with Parallax */}
@@ -435,10 +410,10 @@ export default function HomeClient({ isAdmin, firstName, projects }: HomeClientP
             className="grid gap-12 lg:grid-cols-4"
           >
             {[
-              { num: "01", title: "Scout & Plan", desc: "Research locations, study weather patterns, and plan the perfect timing for optimal light conditions." },
-              { num: "02", title: "Capture", desc: "Patient observation and technical precision to capture the scene exactly as envisioned, often waiting hours for the perfect moment." },
-              { num: "03", title: "Refine", desc: "Careful post-processing to enhance the natural beauty while maintaining authenticity and emotional impact." },
-              { num: "04", title: "Print & Frame", desc: "Museum-quality printing on archival materials, professionally framed to preserve the work for generations." },
+              { num: "01", title: "Inspection & Planification", desc: "Nous étudions les lieux, analysons les conditions météorologiques et planifions le moment idéal pour obtenir la meilleure lumière." },
+              { num: "02", title: "Construction", desc: "Nous construisons le batîment comme convenu avec soin et précision. " },
+              { num: "03", title: "Finition", desc: "Nous ajoutons toutes les finitions nécessaires pour assurer la qualité et la durabilité du projet." },
+              { num: "04", title: "Livraison", desc: "Le batîment est livré et prêt à être utilisé." },
             ].map((step, i) => (
               <motion.div
                 key={i}
@@ -449,7 +424,7 @@ export default function HomeClient({ isAdmin, firstName, projects }: HomeClientP
                 <h3 className="mb-4 font-display text-2xl text-[#f5f3f0]">{step.title}</h3>
                 <p className="leading-relaxed text-[#f5f3f0]/60">{step.desc}</p>
                 
-                {i < 3 && (
+                {i < 4 && (
                   <div className="absolute right-0 top-8 hidden h-px w-full bg-gradient-to-r from-[#6b8e6f]/30 to-transparent lg:block" />
                 )}
               </motion.div>
@@ -485,17 +460,17 @@ export default function HomeClient({ isAdmin, firstName, projects }: HomeClientP
           >
             {[
               { 
-                quote: "The attention to detail and emotional depth in every photograph is extraordinary. The print we commissioned has become the centerpiece of our home.",
-                author: "Exemple Paysages",
-                role: "Paysages Bretons"
+                quote: "L'attention au détail et le professionnalisme de l'équipe ont été exceptionnels. Notre projet a été réalisé dans les délais et a dépassé nos attentes en termes de qualité.",
+                author: "Exemple hôtelier",
+                role: "Hôtelier Breton"
               },
               { 
-                quote: "Working with Alex was an absolute pleasure. The final images exceeded our expectations and perfectly captured the essence of our brand's connection to nature.",
-                author: "Exemple Peintre",
-                role: "Peintre Breton"
+                quote: "Cette enterprise a vraiment fourni un travail de qualité supérieure. Leur expertise en matière de construction durable et leur engagement envers la satisfaction du client sont évidents dans chaque aspect du projet.",
+                author: "Exemple cinéma",
+                role: "Cinéaste Breton"
               },
               { 
-                quote: "Each piece tells a story that resonates deeply. The craftsmanship and artistic vision are unparalleled. A true master of the craft.",
+                quote: "Nos nouveaux locaux sont magnifiques et fonctionnels, grâce à l'expertise de cette entreprise. Leur équipe a été un plaisir de travailler avec, et nous sommes ravis du résultat final.",
                 author: "Exemple Menuiserie",
                 role: "Menuiserie Bretonne"
               },
@@ -530,24 +505,24 @@ export default function HomeClient({ isAdmin, firstName, projects }: HomeClientP
             className="text-center"
           >
             <motion.p variants={fadeInUp} className="mb-4 font-display text-sm tracking-[0.3em] text-[#6b8e6f]">
-              GET IN TOUCH
+              CONTACTEZ NOUS
             </motion.p>
             <motion.h2 variants={fadeInUp} className="mb-8 font-display text-4xl tracking-tight text-[#f5f3f0] sm:text-5xl lg:text-6xl">
-              Let&apos;s Create Something Beautiful
+              Prêt à discuter de votre projet ?
             </motion.h2>
             <motion.p variants={fadeInUp} className="mx-auto mb-12 max-w-2xl text-lg leading-relaxed text-[#f5f3f0]/70">
-              Interested in purchasing a print, commissioning a piece, or collaborating on a project? I&apos;d love to hear from you.
+              Nous sommes impatients de collaborer avec vous pour concrétiser votre vision. Que vous ayez une idée précise ou que vous souhaitiez simplement en savoir plus sur nos services, n'hésitez pas à nous contacter. Notre équipe d'experts est là pour répondre à toutes vos questions et vous guider à chaque étape du processus.
             </motion.p>
 
             <motion.div variants={fadeInUp} className="flex flex-col items-center justify-center gap-6 sm:flex-row">
               <a
-                href="mailto:hello@alexmorgan.art"
+                href="mailto:contact@exemple.btp"
                 className="group flex items-center gap-3 rounded-full bg-[#6b8e6f] px-8 py-4 font-medium text-[#0a0f0d] transition-all hover:bg-[#7a9d7e] hover:shadow-[0_0_40px_-10px_rgba(107,142,111,0.6)]"
               >
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                Send Email
+                Envoyez un email
               </a>
               
               <div className="flex items-center gap-4">
@@ -573,27 +548,6 @@ export default function HomeClient({ isAdmin, firstName, projects }: HomeClientP
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="relative z-10 border-t border-[#3d4d43]/20 bg-[#0f1512] py-12">
-        <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
-          <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
-            <p className="text-sm text-[#f5f3f0]/40">
-              © {new Date().getFullYear()}  <Link
-                  href="/login">
-                  Alex Morgan
-                </Link>. All rights reserved.
-            </p>
-            <div className="flex gap-8 text-sm">
-              <a href="#" className="text-[#f5f3f0]/40 transition-colors hover:text-[#6b8e6f]">
-                Privacy Policy
-              </a>
-              <a href="#" className="text-[#f5f3f0]/40 transition-colors hover:text-[#6b8e6f]">
-                Terms of Service
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
     </main>
   );
 }

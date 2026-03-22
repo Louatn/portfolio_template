@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { ProjectStatus } from "@prisma/client";
 import { CachedProject } from "@/lib/project-storage";
 
@@ -10,6 +10,7 @@ interface ProjectCardProps {
   onDelete?: (id: string) => void;
   onArchive?: (id: string) => void;
   onUnarchive?: (id: string) => void;
+  onPublish?: (id: string) => void;
 }
 
 export function ProjectCard({ 
@@ -17,8 +18,10 @@ export function ProjectCard({
   onEdit, 
   onDelete,
   onArchive,
-  onUnarchive 
+  onUnarchive,
+  onPublish
 }: ProjectCardProps) {
+  const [isDeleting, setIsDeleting] = useState(false);
   const statusColors = {
     DRAFT: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
     PUBLISHED: "bg-green-500/20 text-green-400 border-green-500/30",
@@ -38,8 +41,21 @@ export function ProjectCard({
     year: 'numeric',
   });
 
+  const handleDelete = () => {
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce projet ?')) {
+      setIsDeleting(true);
+      setTimeout(() => {
+        onDelete?.(project.id);
+      }, 300);
+    }
+  };
+
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm transition hover:border-white/20 hover:bg-white/10">
+    <div className={`group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm transition hover:border-white/20 hover:bg-white/10 ${
+      isDeleting ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
+    }`}
+    style={{ transition: 'opacity 300ms ease-out, transform 300ms ease-out' }}
+    >
       {/* Cover Image */}
       <div className="relative aspect-video w-full overflow-hidden bg-black/30">
         {coverImage ? (
@@ -98,6 +114,18 @@ export function ProjectCard({
             </button>
           )}
 
+          {project.status === ProjectStatus.ARCHIVED && onPublish && (
+            <button
+              onClick={() => onPublish(project.id)}
+              className="rounded-full bg-green-500/20 p-2 text-white backdrop-blur-sm transition hover:bg-green-500/40"
+              title="Publier"
+            >
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </button>
+          )}
+
           {project.status !== ProjectStatus.ARCHIVED && onArchive && (
             <button
               onClick={() => onArchive(project.id)}
@@ -112,11 +140,7 @@ export function ProjectCard({
 
           {onDelete && (
             <button
-              onClick={() => {
-                if (confirm('Êtes-vous sûr de vouloir supprimer ce projet ?')) {
-                  onDelete(project.id);
-                }
-              }}
+              onClick={handleDelete}
               className="rounded-full bg-red-500/20 p-2 text-white backdrop-blur-sm transition hover:bg-red-500/40"
               title="Supprimer"
             >

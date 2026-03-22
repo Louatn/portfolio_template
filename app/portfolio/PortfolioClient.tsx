@@ -1,17 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, Variants } from "framer-motion";
-import { ProjectWithImages } from "../actions/get-projects";
+import { loadPublicProjectsData, type PublicProject } from "@/lib/public-project-session";
 import { getProjectImageUrl } from "@/lib/utils/image-helpers";
-import { SignOutButton } from "@/components/SignOutButton";
-
-interface PortfolioClientProps {
-  projects: ProjectWithImages[];
-  categories: string[];
-  isAdmin: boolean;
-}
 
 const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 40 },
@@ -34,8 +27,34 @@ const scaleIn: Variants = {
   visible: { opacity: 1, scale: 1, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } }
 };
 
-export default function PortfolioClient({ projects, categories, isAdmin }: PortfolioClientProps) {
+export default function PortfolioClient() {
+  const [projects, setProjects] = useState<PublicProject[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isActive = true;
+
+    const loadProjects = async () => {
+      try {
+        const data = await loadPublicProjectsData();
+        if (!isActive) {
+          return;
+        }
+
+        setProjects(data.publishedProjects);
+        setCategories(data.categories);
+      } catch (error) {
+        console.error("Error loading portfolio projects:", error);
+      }
+    };
+
+    loadProjects();
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
 
   const filteredProjects = selectedCategory
     ? projects.filter(p => p.category === selectedCategory)
@@ -43,50 +62,6 @@ export default function PortfolioClient({ projects, categories, isAdmin }: Portf
 
   return (
     <main className="relative min-h-screen bg-[#0a0f0d] text-[#f5f3f0] selection:bg-[#6b8e6f]/30">
-      {/* Navigation */}
-      <motion.nav 
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        className="fixed top-0 left-0 right-0 z-50 px-6 pt-6 sm:px-8 lg:px-12"
-      >
-        <div className="mx-auto max-w-7xl">
-          <div className="flex items-center justify-between rounded-2xl border border-[#3d4d43]/30 bg-[#0a0f0d]/80 px-6 py-4 shadow-2xl backdrop-blur-xl">
-            <Link href="/" className="font-display text-lg tracking-tight text-[#f5f3f0] sm:text-xl hover:text-[#6b8e6f] transition-colors">
-              Alex Morgan <span className="ml-2 text-[#6b8e6f]">•</span>
-            </Link>
-
-            <div className="flex items-center gap-6">
-              <Link href="/#about" className="hidden text-sm text-[#f5f3f0]/70 transition-colors hover:text-[#f5f3f0] sm:block">
-                About
-              </Link>
-              <Link href="/#contact" className="hidden text-sm text-[#f5f3f0]/70 transition-colors hover:text-[#f5f3f0] sm:block">
-                Contact
-              </Link>
-              
-              {isAdmin ? (
-                <div className="flex items-center gap-3">
-                  <Link
-                    href="/dashboard"
-                    className="rounded-lg border border-[#6b8e6f]/30 bg-[#6b8e6f]/10 px-3 py-1.5 text-xs text-[#6b8e6f] transition-all hover:bg-[#6b8e6f]/20"
-                  >
-                    Dashboard
-                  </Link>
-                  <SignOutButton className="text-xs text-[#f5f3f0]/50 hover:text-[#f5f3f0]" />
-                </div>
-              ) : (
-                <Link
-                  href="/login"
-                  className="text-xs text-[#f5f3f0]/50 transition-colors hover:text-[#f5f3f0]"
-                >
-                  Admin
-                </Link>
-              )}
-            </div>
-          </div>
-        </div>
-      </motion.nav>
-
       {/* Hero Section */}
       <section className="relative pt-32 pb-16 px-6 sm:px-8 lg:px-12">
         <div className="mx-auto max-w-7xl">
