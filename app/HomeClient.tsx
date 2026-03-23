@@ -127,7 +127,7 @@ export default function HomeClient() {
             </motion.p>
             
               <motion.h2 variants={fadeInUp} className="relative mb-8 font-display text-5xl leading-[1.1] tracking-tight text-[#f5f3f0] sm:text-6xl md:text-7xl lg:text-8xl drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
-              Le bâtimentnt 
+              Le bâtiment 
               <br />
               <div className="relative inline-flex items-center gap-2">
                 <div className=" flex flex-col justify-center">
@@ -424,9 +424,9 @@ export default function HomeClient() {
           >
             {[
               { num: "01", title: "Inspection & Planification", desc: "Nous étudions les lieux, analysons les conditions météorologiques et planifions le moment idéal pour obtenir la meilleure lumière." },
-              { num: "02", title: "Construction", desc: "Nous construisons le bâtimentnt comme convenu avec soin et précision. " },
+              { num: "02", title: "Construction", desc: "Nous construisons le bâtiment comme convenu avec soin et précision. " },
               { num: "03", title: "Finition", desc: "Nous ajoutons toutes les finitions nécessaires pour assurer la qualité et la durabilité du projet." },
-              { num: "04", title: "Livraison", desc: "Le bâtimentnt est livré et prêt à être utilisé." },
+              { num: "04", title: "Livraison", desc: "Le bâtiment est livré et prêt à être utilisé." },
             ].map((step, i) => (
               <motion.div
                 key={i}
